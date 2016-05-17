@@ -1,8 +1,18 @@
 require 'redmine'
 
+if Rails::VERSION::MAJOR >= 3
+  ActionDispatch::Callbacks.to_prepare do
+    load 'patches/issues_controller_patch.rb'
+  end
+else
+  Dispatcher.to_prepare do
+    load 'patches/issues_controller_patch.rb'
+  end
+end
+
 Redmine::Plugin.register :redmine_fields_permissions do
   name 'Redmine Fields Permissions Plugin'
-  author 'Romain E SILVA (Sysdream)'
+  author 'Romain E SILVA (Sysdream), Alexander Morozov'
   description 'This Redmine plugin add additional permissions for fields in workflow. This plugin is based on http://9thport.net/2011/03/20/redmine-hide-assigned-to-field-with-role-permissions-plugin/ by Aaron Addleman'
   version '1.0.0'
   url 'http://www.sysdream.com/'
@@ -14,6 +24,8 @@ Redmine::Plugin.register :redmine_fields_permissions do
         #map.permission :add_issues, {:issues => [:new, :create, :update_form], :attachments => :upload}
       # Permissions for assigned to field
       map.permission :edit_issue_assigned_to, {:issues => [:new, :create, :update_form]}
+
+      map.permission :edit_issue_author, {:issues => [:new, :create, :update_form]}
       
       # Permissions for due date field
       map.permission :edit_issue_due_date, {:issues => [:new, :create, :update_form]}
